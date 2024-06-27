@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="vendor/autoload.php"
+         cacheDirectory="Storage/framework/phpunit"> <!-- Specify the directory for cache files -->
+    <testsuites>
+        <testsuite name="My Tests">
+            <directory>Tests</directory> <!-- Adjust the directory to point to your Tests directory -->
+        </testsuite>
+    </testsuites>
+</phpunit>
