@@ -1,7 +1,7 @@
 <?php
 
 namespace Koochik\Koochik;
-use App\MiddlewareGroup;
+use Koochik\Koochik\MiddlewareGroup;
 use Koochik\Koochik\Contracts\RouteInterface;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -54,39 +54,39 @@ class Application {
 
     //=================================== HTTP METHODS ======================================
 
-    public function get(String $uri, $handler): Route {
+    public function get(string $uri, $handler): Route {
         return $this->router->register('GET', $uri, $handler);
     }
 
-    public function post(String $uri, $handler): Route {
+    public function post(string $uri, $handler): Route {
         return $this->router->register('POST', $uri, $handler);
     }
 
-    public function head(String $uri, $handler)
+    public function head(string $uri, $handler)
     {
         return $this->router->register('HEAD', $uri, $handler);
 
     }
 
-    public function options(String $uri, $handler)
+    public function options(string $uri, $handler)
     {
         return $this->router->register('OPTIONS', $uri, $handler);
 
     }
 
-    public function patch(String $uri, $handler)
+    public function patch(string $uri, $handler)
     {
         return $this->router->register('PATCH', $uri, $handler);
 
     }
 
-    public function delete(String $uri, $handler)
+    public function delete(string $uri, $handler)
     {
         return $this->router->register('DELETE', $uri, $handler);
 
     }
 
-    public function put(String $uri, $handler)
+    public function put(string $uri, $handler)
     {
         return $this->router->register('PUT', $uri, $handler);
 
@@ -96,7 +96,7 @@ class Application {
     //=================================== HTTP METHODS ======================================
 
 
-    public function middleware(String | Array $middlewares): static {
+    public function middleware(string | Array $middlewares): static {
         if (is_string($middlewares)) {
             $middlewares = [$middlewares];
         }

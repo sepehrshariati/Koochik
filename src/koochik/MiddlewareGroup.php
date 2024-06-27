@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Koochik\Koochik;
 
 class MiddlewareGroup
 {

@@ -16,7 +16,7 @@ class Group
     }
 
 
-    public function middleware(String | Array $middlewares): static {
+    public function middleware(string | Array $middlewares): static {
         if (is_string($middlewares)) {
             $middlewares = [$middlewares];
         }
