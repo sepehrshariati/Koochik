@@ -1,10 +1,10 @@
 <?php
-namespace Tests\Routing;
+namespace Koochik\Tests\Routing;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Laminas\Diactoros\Response;
-use Tests\TestCases\ApplicationTestCase;
-use Tests\Mocks\Controllers\DemoController;
+use Koochik\Tests\TestCases\ApplicationTestCase;
+use Koochik\Tests\Mocks\Controllers\DemoController;
 
 class RouteControllerTest extends ApplicationTestCase
 {

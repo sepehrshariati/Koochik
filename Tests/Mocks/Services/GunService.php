@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Mocks\Services;
+namespace Koochik\Tests\Mocks\Services;
 
 class GunService
 {

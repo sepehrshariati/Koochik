@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Mocks\Middlewares;
+namespace Koochik\Tests\Mocks\Middlewares;
 use Laminas\Diactoros\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

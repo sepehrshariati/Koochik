@@ -1,10 +1,10 @@
 <?php
-namespace Tests\Routing;
+namespace Koochik\Tests\Routing;
 
 use Laminas\Diactoros\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Tests\TestCases\ApplicationTestCase;
+use Koochik\Tests\TestCases\ApplicationTestCase;
 
 class NotFoundAndMethodNotAllowedHandlerTest extends ApplicationTestCase
 {

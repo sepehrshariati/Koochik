@@ -1,12 +1,12 @@
 <?php
-namespace Tests\Middleware;
+namespace Koochik\Tests\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Tests\TestCases\ApplicationTestCase;
-use Tests\Mocks\Middlewares\DemoMiddleware;
-use Tests\Mocks\Middlewares\DummyMiddleware;
-use Tests\Mocks\Middlewares\SampleMiddleware;
-use Tests\Mocks\Middlewares\UnauthenticatedMiddleware;
+use Koochik\Tests\TestCases\ApplicationTestCase;
+use Koochik\Tests\Mocks\Middlewares\DemoMiddleware;
+use Koochik\Tests\Mocks\Middlewares\DummyMiddleware;
+use Koochik\Tests\Mocks\Middlewares\SampleMiddleware;
+use Koochik\Tests\Mocks\Middlewares\UnauthenticatedMiddleware;
 use Laminas\Diactoros\Response;
 
 class MiddlewareTest extends ApplicationTestCase

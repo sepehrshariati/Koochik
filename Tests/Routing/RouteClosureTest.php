@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Routing;
+namespace Koochik\Tests\Routing;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Laminas\Diactoros\Response;
-use Tests\TestCases\ApplicationTestCase;
+use Koochik\Tests\TestCases\ApplicationTestCase;
 
 class RouteClosureTest extends ApplicationTestCase
 {
