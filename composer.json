@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Koochik\\Koochik\\": "src/"
+            "Koochik\\Koochik\\": "src/",
+            "Koochik\\Koochik\\Tests\\": "Tests/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Koochik\\Tests\\": "Tests/"
         }
     },
     "authors": [

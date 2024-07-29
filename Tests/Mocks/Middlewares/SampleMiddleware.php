@@ -1,5 +1,5 @@
 <?php
-namespace Koochik\Tests\Mocks\Middlewares;
+namespace Koochik\Koochik\Tests\Mocks\Middlewares;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;

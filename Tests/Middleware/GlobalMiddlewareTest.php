@@ -1,9 +1,9 @@
 <?php
-namespace Koochik\Tests\Middleware;
+namespace Koochik\Koochik\Tests\Middleware;
 use Psr\Http\Message\ServerRequestInterface AS Request;
-use Koochik\Tests\Mocks\Controllers\DemoController;
-use Koochik\Tests\TestCases\ApplicationTestCase;
-use Koochik\Tests\Mocks\Middlewares\DummyMiddleware;
+use Koochik\Koochik\Tests\Mocks\Controllers\DemoController;
+use Koochik\Koochik\Tests\TestCases\ApplicationTestCase;
+use Koochik\Koochik\Tests\Mocks\Middlewares\DummyMiddleware;
 use Laminas\Diactoros\Response;
 
 class GlobalMiddlewareTest extends ApplicationTestCase

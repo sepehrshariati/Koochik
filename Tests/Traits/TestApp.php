@@ -1,6 +1,6 @@
 <?php
 
-namespace Koochik\Tests\Traits;
+namespace Koochik\Koochik\Tests\Traits;
 
 use DI\ContainerBuilder;
 use Koochik\Koochik\Application;
