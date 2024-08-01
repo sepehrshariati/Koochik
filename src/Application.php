@@ -191,6 +191,9 @@ class Application {
         $TotalRouteMiddlewares = [];
         $TotalRouteMiddlewaresGroups=[];
 
+        //Add global middlewares
+        $TotalRouteMiddlewares = array_merge($TotalRouteMiddlewares, $this->middlewares);
+
         // Add route specific middlewares
         $TotalRouteMiddlewares = array_merge($TotalRouteMiddlewares, $route->getMiddlewares());
 
@@ -198,8 +201,6 @@ class Application {
         $TotalRouteMiddlewaresGroups = array_merge($TotalRouteMiddlewaresGroups, $route->getMiddlewareGroups());
 
 
-        //Add global middlewares
-        $TotalRouteMiddlewares = array_merge($TotalRouteMiddlewares, $this->middlewares);
 
 
         // Add middlewares and middleware groups from groups the route belong to
