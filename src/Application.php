@@ -114,36 +114,75 @@ class Application {
     public function dispatchRequest(ServerRequestInterface $request): ResponseInterface {
         $httpMethod = $request->getMethod();
         $uri = $request->getUri()->getPath();
-        $routeInfo = $this->router->dispatch($httpMethod, $uri);
 
-        switch ($routeInfo[0]) {
-            case RouteInterface::NOT_FOUND:
-                $response = $this->customNotFoundHandler
-                    ? ($this->customNotFoundHandler)($request)
-                    : $this->getNotFoundResponse();
-                break;
-            case RouteInterface::METHOD_NOT_ALLOWED:
-                $response = $this->customMethodNotAllowedHandler
-                    ? ($this->customMethodNotAllowedHandler)($request)
-                    : $this->makeMethodNotAllowedResponse();
-                break;
-            case RouteInterface::FOUND:
+        if ($httpMethod === 'OPTIONS') {
+            $routeInfo = $this->router->dispatch('OPTIONS', $uri);
+            if ($routeInfo[0] === RouteInterface::FOUND) {
+                // Handle explicit OPTIONS route
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
-
                 if (is_callable($handler)) {
                     $response = $this->makeFoundResponseFromCallback($handler, $vars, $request);
                 } else {
                     [$controllerName, $method] = $handler;
-                    $response = $this->makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request);
+                    $response = $this->makeFoundResponse($controllerName, 'OPTIONS', $handler, $method, $vars, $request);
                 }
-                break;
-
-            default:
-                $response = $this->makeDefaultResponse();
+            } else {
+                // Check for other methods
+                $tempRouteInfo = $this->router->dispatch('GET', $uri); // Using GET as a probe
+                if ($tempRouteInfo[0] === RouteInterface::FOUND || $tempRouteInfo[0] === RouteInterface::METHOD_NOT_ALLOWED) {
+                    // Get allowed methods
+                    $allowedMethods = $this->getAllowedMethods($uri);
+                    $allowedMethods[] = 'OPTIONS';
+                    $response = new Response();
+                    $response = $response->withHeader('Allow', implode(', ', array_unique($allowedMethods)));
+                } else {
+                    // NOT_FOUND
+                    $response = $this->customNotFoundHandler
+                        ? ($this->customNotFoundHandler)($request)
+                        : $this->getNotFoundResponse();
+                }
+            }
+        } else {
+            $routeInfo = $this->router->dispatch($httpMethod, $uri);
+            switch ($routeInfo[0]) {
+                case RouteInterface::NOT_FOUND:
+                    $response = $this->customNotFoundHandler
+                        ? ($this->customNotFoundHandler)($request)
+                        : $this->getNotFoundResponse();
+                    break;
+                case RouteInterface::METHOD_NOT_ALLOWED:
+                    $response = $this->customMethodNotAllowedHandler
+                        ? ($this->customMethodNotAllowedHandler)($request)
+                        : $this->makeMethodNotAllowedResponse();
+                    break;
+                case RouteInterface::FOUND:
+                    $handler = $routeInfo[1];
+                    $vars = $routeInfo[2];
+                    if (is_callable($handler)) {
+                        $response = $this->makeFoundResponseFromCallback($handler, $vars, $request);
+                    } else {
+                        [$controllerName, $method] = $handler;
+                        $response = $this->makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request);
+                    }
+                    break;
+                default:
+                    $response = $this->makeDefaultResponse();
+            }
         }
-
         return $response;
+    }
+
+    private function getAllowedMethods(string $uri): array {
+        $allowedMethods = [];
+        $methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD']; // List of methods to check
+        foreach ($methods as $method) {
+            $routeInfo = $this->router->dispatch($method, $uri);
+            if ($routeInfo[0] === RouteInterface::FOUND) {
+                $allowedMethods[] = $method;
+            }
+        }
+        return array_unique($allowedMethods);
     }
 
 
