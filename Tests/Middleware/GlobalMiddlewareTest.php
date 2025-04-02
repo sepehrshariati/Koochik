@@ -41,6 +41,17 @@ class GlobalMiddlewareTest extends ApplicationTestCase
         $this->assertSame('Dummy-Header-Value', $response->getHeaderLine('Dummy-Header'));
     }
 
+    public function testGlobalMiddlewareAppliedInOptions(): void
+    {
+        $request = $this->options('/global-middleware-test');
+        $response = $this->send($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('Dummy-Header-Value', $response->getHeaderLine('Dummy-Header'));
+    }
+
+
+
     public function testGlobalMiddlewareAppliedToController(): void
     {
         $request = $this->get('/controller-middleware-test');
@@ -50,12 +61,17 @@ class GlobalMiddlewareTest extends ApplicationTestCase
         $this->assertSame('Dummy-Header-Value', $response->getHeaderLine('Dummy-Header'));
     }
 
-//    public function testGlobalMiddlewareAppliedToRouteGroup(): void
-//    {
-//        $request = $this->get('/group/middleware-test');
-//        $response = $this->send($request);
-//
-//        $this->assertSame(200, $response->getStatusCode());
-//        $this->assertSame('Dummy-Header-Value', $response->getHeaderLine('Dummy-Header'));
-//    }
+
+    public function testGlobalMiddlewareAppliedToControllerInOptions(): void
+    {
+        $request = $this->options('/controller-middleware-test');
+        $response = $this->send($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('Dummy-Header-Value', $response->getHeaderLine('Dummy-Header'));
+    }
+
+
+
+
 }

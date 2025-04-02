@@ -115,76 +115,107 @@ class Application {
         $httpMethod = $request->getMethod();
         $uri = $request->getUri()->getPath();
 
-        if ($httpMethod === 'OPTIONS') {
-            $routeInfo = $this->router->dispatch('OPTIONS', $uri);
-            if ($routeInfo[0] === RouteInterface::FOUND) {
-                // Handle explicit OPTIONS route
+        // First try to dispatch the actual request, regardless of method
+        $routeInfo = $this->router->dispatch($httpMethod, $uri);
+
+        // Create an early response based on route info
+        $earlyResponse = null;
+
+        switch ($routeInfo[0]) {
+            case RouteInterface::NOT_FOUND:
+                // For OPTIONS, we need special handling if the route exists but for other methods
+                if ($httpMethod === 'OPTIONS') {
+                    // Check if this path exists for other methods
+                    $allowedMethods = $this->getAllowedMethods($uri);
+                    if (!empty($allowedMethods)) {
+                        // Automatically add HEAD if GET is present
+                        if (in_array('GET', $allowedMethods) && !in_array('HEAD', $allowedMethods)) {
+                            $allowedMethods[] = 'HEAD';
+                        }
+                        $allowedMethods[] = 'OPTIONS';
+                        $earlyResponse = new Response();
+                        $earlyResponse = $earlyResponse->withHeader('Allow', implode(', ', array_unique($allowedMethods)));
+                    } else {
+                        $earlyResponse = $this->customNotFoundHandler
+                            ? ($this->customNotFoundHandler)($request)
+                            : $this->getNotFoundResponse();
+                    }
+                } else {
+                    $earlyResponse = $this->customNotFoundHandler
+                        ? ($this->customNotFoundHandler)($request)
+                        : $this->getNotFoundResponse();
+                }
+                break;
+
+            case RouteInterface::METHOD_NOT_ALLOWED:
+                if ($httpMethod === 'OPTIONS') {
+                    // Return OPTIONS response with Allow header
+                    $allowedMethods = $routeInfo[1] ?? []; // This contains allowed methods from router
+                    // Automatically add HEAD if GET is present
+                    if (in_array('GET', $allowedMethods) && !in_array('HEAD', $allowedMethods)) {
+                        $allowedMethods[] = 'HEAD';
+                    }
+                    $allowedMethods[] = 'OPTIONS';
+                    $earlyResponse = new Response();
+                    $earlyResponse = $earlyResponse->withHeader('Allow', implode(', ', array_unique($allowedMethods)));
+                } else {
+                    $earlyResponse = $this->customMethodNotAllowedHandler
+                        ? ($this->customMethodNotAllowedHandler)($request)
+                        : $this->makeMethodNotAllowedResponse();
+                }
+                break;
+
+            case RouteInterface::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
                 if (is_callable($handler)) {
-                    $response = $this->makeFoundResponseFromCallback($handler, $vars, $request);
+                    return $this->makeFoundResponseFromCallback($handler, $vars, $request);
                 } else {
                     [$controllerName, $method] = $handler;
-                    $response = $this->makeFoundResponse($controllerName, 'OPTIONS', $handler, $method, $vars, $request);
+                    return $this->makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request);
                 }
-            } else {
-                // Check for other methods
-                $tempRouteInfo = $this->router->dispatch('GET', $uri); // Using GET as a probe
-                if ($tempRouteInfo[0] === RouteInterface::FOUND || $tempRouteInfo[0] === RouteInterface::METHOD_NOT_ALLOWED) {
-                    // Get allowed methods
-                    $allowedMethods = $this->getAllowedMethods($uri);
-                    $allowedMethods[] = 'OPTIONS';
-                    $response = new Response();
-                    $response = $response->withHeader('Allow', implode(', ', array_unique($allowedMethods)));
-                } else {
-                    // NOT_FOUND
-                    $response = $this->customNotFoundHandler
-                        ? ($this->customNotFoundHandler)($request)
-                        : $this->getNotFoundResponse();
-                }
-            }
-        } else {
-            $routeInfo = $this->router->dispatch($httpMethod, $uri);
-            switch ($routeInfo[0]) {
-                case RouteInterface::NOT_FOUND:
-                    $response = $this->customNotFoundHandler
-                        ? ($this->customNotFoundHandler)($request)
-                        : $this->getNotFoundResponse();
-                    break;
-                case RouteInterface::METHOD_NOT_ALLOWED:
-                    $response = $this->customMethodNotAllowedHandler
-                        ? ($this->customMethodNotAllowedHandler)($request)
-                        : $this->makeMethodNotAllowedResponse();
-                    break;
-                case RouteInterface::FOUND:
-                    $handler = $routeInfo[1];
-                    $vars = $routeInfo[2];
-                    if (is_callable($handler)) {
-                        $response = $this->makeFoundResponseFromCallback($handler, $vars, $request);
-                    } else {
-                        [$controllerName, $method] = $handler;
-                        $response = $this->makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request);
-                    }
-                    break;
-                default:
-                    $response = $this->makeDefaultResponse();
-            }
+                break;
+
+            default:
+                $earlyResponse = $this->makeDefaultResponse();
         }
-        return $response;
+
+        // If we have an early response (for OPTIONS, NOT_FOUND, METHOD_NOT_ALLOWED),
+        // pass it through the middleware stack
+        if ($earlyResponse) {
+            // Use global middlewares for automatic responses
+            $middlewares = $this->makeMiddlewaresInstances($this->middlewares);
+
+            // Create a handler for the response
+            $finalHandler = function($request) use ($earlyResponse) {
+                return $earlyResponse;
+            };
+
+            return $this->handleMiddlewaresAndController($middlewares, $finalHandler, $request);
+        }
+
+        // This should never be reached as all cases should be handled above
+        return new Response();
     }
 
     private function getAllowedMethods(string $uri): array {
         $allowedMethods = [];
         $methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD']; // List of methods to check
+
         foreach ($methods as $method) {
             $routeInfo = $this->router->dispatch($method, $uri);
             if ($routeInfo[0] === RouteInterface::FOUND) {
                 $allowedMethods[] = $method;
             }
         }
+
+        // If GET is allowed but HEAD isn't explicitly defined, add HEAD
+        if (in_array('GET', $allowedMethods) && !in_array('HEAD', $allowedMethods)) {
+            $allowedMethods[] = 'HEAD';
+        }
+
         return array_unique($allowedMethods);
     }
-
 
 
     public function getNotFoundResponse(): Response {
