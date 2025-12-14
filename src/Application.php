@@ -9,7 +9,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Relay\Relay;
-
 class Application {
     private Router $router;
     private ContainerInterface $container;
@@ -35,7 +34,6 @@ class Application {
 
     private function makeMiddlewaresInstances($middlewares): array {
         $instances = [];
-
         foreach ($middlewares as $middlewareName) {
             $instances[] = $this->container->get($middlewareName);
         }
@@ -65,31 +63,26 @@ class Application {
     public function head(string $uri, $handler)
     {
         return $this->router->register('HEAD', $uri, $handler);
-
     }
 
     public function options(string $uri, $handler)
     {
         return $this->router->register('OPTIONS', $uri, $handler);
-
     }
 
     public function patch(string $uri, $handler)
     {
         return $this->router->register('PATCH', $uri, $handler);
-
     }
 
     public function delete(string $uri, $handler)
     {
         return $this->router->register('DELETE', $uri, $handler);
-
     }
 
     public function put(string $uri, $handler)
     {
         return $this->router->register('PUT', $uri, $handler);
-
     }
 
 
@@ -118,14 +111,25 @@ class Application {
         // First try to dispatch the actual request, regardless of method
         $routeInfo = $this->router->dispatch($httpMethod, $uri);
 
-        // Create an early response based on route info
-        $earlyResponse = null;
+        // Handle automatic HEAD fallback to GET
+        if ($routeInfo[0] === RouteInterface::METHOD_NOT_ALLOWED && $httpMethod === 'HEAD') {
+            $allowedMethods = $routeInfo[1] ?? [];
+            if (in_array('GET', $allowedMethods)) {
+                // Re-dispatch as GET to find the route handler
+                $routeInfo = $this->router->dispatch('GET', $uri);
+                // Update $httpMethod to GET so getRoute() can find the correct route object
+                $httpMethod = 'GET';
+            }
+        }
 
+// Create an early response based on route info
+        $earlyResponse = null;
         switch ($routeInfo[0]) {
             case RouteInterface::NOT_FOUND:
                 // For OPTIONS, we need special handling if the route exists but for other methods
                 if ($httpMethod === 'OPTIONS') {
                     // Check if this path exists for other methods
+
                     $allowedMethods = $this->getAllowedMethods($uri);
                     if (!empty($allowedMethods)) {
                         // Automatically add HEAD if GET is present
@@ -137,20 +141,22 @@ class Application {
                         $earlyResponse = $earlyResponse->withHeader('Allow', implode(', ', array_unique($allowedMethods)));
                     } else {
                         $earlyResponse = $this->customNotFoundHandler
-                            ? ($this->customNotFoundHandler)($request)
+                            ?
+                            ($this->customNotFoundHandler)($request)
                             : $this->getNotFoundResponse();
                     }
                 } else {
                     $earlyResponse = $this->customNotFoundHandler
-                        ? ($this->customNotFoundHandler)($request)
+                        ?
+                        ($this->customNotFoundHandler)($request)
                         : $this->getNotFoundResponse();
                 }
                 break;
-
             case RouteInterface::METHOD_NOT_ALLOWED:
                 if ($httpMethod === 'OPTIONS') {
                     // Return OPTIONS response with Allow header
-                    $allowedMethods = $routeInfo[1] ?? []; // This contains allowed methods from router
+                    $allowedMethods = $routeInfo[1] ??
+                        []; // This contains allowed methods from router
                     // Automatically add HEAD if GET is present
                     if (in_array('GET', $allowedMethods) && !in_array('HEAD', $allowedMethods)) {
                         $allowedMethods[] = 'HEAD';
@@ -160,22 +166,23 @@ class Application {
                     $earlyResponse = $earlyResponse->withHeader('Allow', implode(', ', array_unique($allowedMethods)));
                 } else {
                     $earlyResponse = $this->customMethodNotAllowedHandler
-                        ? ($this->customMethodNotAllowedHandler)($request)
+                        ?
+                        ($this->customMethodNotAllowedHandler)($request)
                         : $this->makeMethodNotAllowedResponse();
                 }
                 break;
-
             case RouteInterface::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
                 if (is_callable($handler)) {
-                    return $this->makeFoundResponseFromCallback($handler, $vars, $request);
+                    $response = $this->makeFoundResponseFromCallback($handler, $vars, $request);
+                    return $this->finalizeResponse($response, $request);
                 } else {
                     [$controllerName, $method] = $handler;
-                    return $this->makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request);
+                    $response = $this->makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request);
+                    return $this->finalizeResponse($response, $request);
                 }
                 break;
-
             default:
                 $earlyResponse = $this->makeDefaultResponse();
         }
@@ -185,17 +192,27 @@ class Application {
         if ($earlyResponse) {
             // Use global middlewares for automatic responses
             $middlewares = $this->makeMiddlewaresInstances($this->middlewares);
-
-            // Create a handler for the response
+// Create a handler for the response
             $finalHandler = function($request) use ($earlyResponse) {
                 return $earlyResponse;
             };
 
-            return $this->handleMiddlewaresAndController($middlewares, $finalHandler, $request);
+            $response = $this->handleMiddlewaresAndController($middlewares, $finalHandler, $request);
+            return $this->finalizeResponse($response, $request);
         }
 
         // This should never be reached as all cases should be handled above
         return new Response();
+    }
+
+    /**
+     * Ensures HEAD requests return an empty body.
+     */
+    private function finalizeResponse(ResponseInterface $response, ServerRequestInterface $request): ResponseInterface {
+        if ($request->getMethod() === 'HEAD') {
+            return $response->withBody(new \Laminas\Diactoros\Stream('php://memory', 'r+'));
+        }
+        return $response;
     }
 
     private function getAllowedMethods(string $uri): array {
@@ -263,17 +280,11 @@ class Application {
 
         //Add global middlewares
         $TotalRouteMiddlewares = array_merge($TotalRouteMiddlewares, $this->middlewares);
-
-        // Add route specific middlewares
+// Add route specific middlewares
         $TotalRouteMiddlewares = array_merge($TotalRouteMiddlewares, $route->getMiddlewares());
-
-        // Add route specific middleware Groups
+// Add route specific middleware Groups
         $TotalRouteMiddlewaresGroups = array_merge($TotalRouteMiddlewaresGroups, $route->getMiddlewareGroups());
-
-
-
-
-        // Add middlewares and middleware groups from groups the route belong to
+// Add middlewares and middleware groups from groups the route belong to
         foreach ($route->getGroups() as $group) {
             $TotalRouteMiddlewares = array_merge($TotalRouteMiddlewares, $group->getMiddlewares());
             $TotalRouteMiddlewaresGroups = array_merge($TotalRouteMiddlewaresGroups, $group->getMiddlewareGroups());
@@ -295,7 +306,6 @@ class Application {
     private function handleMiddlewaresAndController(array $middlewares, callable $controllerHandler, ServerRequestInterface $request): ResponseInterface {
         $middlewares[] = new class($controllerHandler) implements \Psr\Http\Server\MiddlewareInterface {
             private $controllerHandler;
-
             public function __construct(callable $controllerHandler) {
                 $this->controllerHandler = $controllerHandler;
             }
@@ -311,7 +321,6 @@ class Application {
 
     public function makeFoundResponse($controllerName, $httpMethod, $handler, $method, $vars, $request): ResponseInterface {
         $controller = $this->container->get($controllerName);
-
         $route = $this->router->getRoute($httpMethod, $handler);
         $middlewares = $this->getMiddlewares($route);
 
@@ -323,7 +332,16 @@ class Application {
     }
 
     private function makeFoundResponseFromCallback(callable $handler, array $vars, ServerRequestInterface $request): ResponseInterface {
-        $route = $this->router->getRoute($request->getMethod(), $handler);
+        $lookupMethod = $request->getMethod();
+        try {
+            $route = $this->router->getRoute($lookupMethod, $handler);
+        } catch (\RuntimeException $e) {
+            if ($lookupMethod === 'HEAD') {
+                $route = $this->router->getRoute('GET', $handler);
+            } else {
+                throw $e;
+            }
+        }
 
         $middlewares = $this->getMiddlewares($route);
 

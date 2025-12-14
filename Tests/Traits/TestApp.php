@@ -36,38 +36,38 @@ trait TestApp
         return $request->withBody(new Stream('php://temp', 'rw'));
     }
 
-    protected function get(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function get(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('GET', $uri, $headers, $body);
     }
 
 
-    protected function post(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function post(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('POST', $uri, $headers, $body);
     }
 
-    protected function put(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function put(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('PUT', $uri, $headers, $body);
     }
 
-    protected function delete(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function delete(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('DELETE', $uri, $headers, $body);
     }
 
-    protected function patch(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function patch(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('PATCH', $uri, $headers, $body);
     }
 
-    protected function options(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function options(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('OPTIONS', $uri, $headers, $body);
     }
 
-    protected function head(string $uri, array $headers = [], string $body = null): ServerRequestInterface
+    protected function head(string $uri, array $headers = [], ?string $body = null): ServerRequestInterface
     {
         return $this->createRequest('HEAD', $uri, $headers, $body);
     }
