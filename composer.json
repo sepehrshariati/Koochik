@@ -1,14 +1,15 @@
 {
-    "name": "koochik/koochik",
+    "name": "kouchik/http-kernel",
     "description": "A simple, elegant, and easy-to-understand PHP HTTP kernel inspired by Slim framework.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Koochik\\Koochik\\": "src/",
-            "Koochik\\Koochik\\Tests\\": "Tests/"
+            "Kouchik\\HttpKernel\\": "src/",
+            "Kouchik\\HttpKernel\\Tests\\": "Tests/"
         }
-    },
+    }
+,
     "autoload-dev": {
         "psr-4": {
         }

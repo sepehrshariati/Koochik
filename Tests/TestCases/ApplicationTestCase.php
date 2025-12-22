@@ -1,8 +1,8 @@
 <?php
-namespace Koochik\Koochik\Tests\TestCases;
+namespace Kouchik\HttpKernel\Tests\TestCases;
 
 use PHPUnit\Framework\TestCase;
-use Koochik\Koochik\Tests\Traits\TestApp;
+use Kouchik\HttpKernel\Tests\Traits\TestApp;
 
 class ApplicationTestCase extends TestCase
 {

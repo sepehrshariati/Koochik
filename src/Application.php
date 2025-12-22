@@ -1,8 +1,8 @@
 <?php
 
-namespace Koochik\Koochik;
-use Koochik\Koochik\MiddlewareGroup;
-use Koochik\Koochik\Contracts\RouteInterface;
+namespace Kouchik\HttpKernel;
+use Kouchik\HttpKernel\MiddlewareGroup;
+use Kouchik\HttpKernel\Contracts\RouteInterface;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequestFactory;
 use Psr\Container\ContainerInterface;

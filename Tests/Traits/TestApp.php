@@ -1,10 +1,10 @@
 <?php
 
-namespace Koochik\Koochik\Tests\Traits;
+namespace Kouchik\HttpKernel\Tests\Traits;
 
 use DI\ContainerBuilder;
-use Koochik\Koochik\Application;
-use Koochik\Koochik\Router;
+use Kouchik\HttpKernel\Application;
+use Kouchik\HttpKernel\Router;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\Stream;
 use Psr\Http\Message\ServerRequestInterface;

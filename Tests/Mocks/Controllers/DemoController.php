@@ -1,5 +1,5 @@
 <?php
-namespace Koochik\Koochik\Tests\Mocks\Controllers;
+namespace Kouchik\HttpKernel\Tests\Mocks\Controllers;
 use Laminas\Diactoros\Response;
 
 class DemoController

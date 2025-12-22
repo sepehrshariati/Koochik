@@ -1,12 +1,14 @@
-# Koochik - A Simple, Elegant PHP HTTP Kernel
-Koochik is a simple, elegant, and easy-to-understand PHP HTTP kernel inspired by the Slim framework. It provides a lightweight and intuitive way to handle HTTP requests and responses, allowing developers to build robust web applications effortlessly.
+# HTTP Kernel
+A lightweight, elegant PSR-7 / PSR-15 HTTP kernel used as the core routing and middleware engine inside the Kouchik framework.
+
+This package provides a simple and intuitive way to handle HTTP requests, routing, middleware, and dependency injection, inspired by Slim.
 
 ## Installation
 
-You can install Koochik via Composer.
+You can install HTTP Kernel via Composer.
 
 ```bash
-composer require koochik/koochik
+composer require kouchik/http-kernel
 ```
 
 ## Basic Usage
@@ -14,8 +16,8 @@ composer require koochik/koochik
 ```
 require __DIR__ . '/../vendor/autoload.php';
 
-use Koochik\Koochik\Application;
-use Koochik\Koochik\Router;
+use Kouchik\HttpKernel\Application;
+use Kouchik\HttpKernel\Router;
 use DI\ContainerBuilder;
 use Laminas\Diactoros\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -28,7 +30,7 @@ $app = new Application($router, $container);
 
 $app->get('/welcome', function (Request $request) {
     $response = new Response();
-    $response->getBody()->write('Welcome to Koochik!');
+    $response->getBody()->write('Welcome to kouchik!');
     return $response;
 })
 ```
@@ -47,7 +49,7 @@ use Laminas\Diactoros\Response;
 class HomeController {
     public function welcome(Request $request) {
         $response = new Response();
-        $response->getBody()->write('Welcome to Koochik via Controller!');
+        $response->getBody()->write('Welcome to kouchik via Controller!');
         return $response;
     }
 }
@@ -94,7 +96,7 @@ use App\Middleware\AuthMiddleware;
 $app->add(AuthMiddleware::class);
 ```
 
-Koochik supports dynamic route parameters to create flexible and dynamic routes.
+HTTP Kernel supports dynamic route parameters to create flexible and dynamic routes.
 ## Dynamic route parameters
 ```
 $app->get('/user/{id}', function (Request $request, $id) {
@@ -105,9 +107,9 @@ $app->get('/user/{id}', function (Request $request, $id) {
 
 ```
 
-## deopendency injection
+## dependency injection
 
-Koochik uses PHP-DI for dependency injection, making it easy to manage your dependencies. Suppose you have a service like:
+HTTP Kernel uses PHP-DI for dependency injection, making it easy to manage your dependencies. Suppose you have a service like:
 ```
 // src/Services/GreetingService.php
 namespace App\Services;
@@ -119,7 +121,7 @@ class GreetingService {
 }
 
 ```
-Koochik uses PHP-DI for dependency injection, making it easy to manage your dependencies. Suppose you have a service like:
+HTTP Kernel uses PHP-DI for dependency injection, making it easy to manage your dependencies. Suppose you have a service like:
 ```
 // index.php
 use App\Services\GreetingService;
@@ -160,7 +162,7 @@ $app->group('/api', function () use ($app) {
 
 
 ## Testing
-Koochik is easy to test using PHPUnit. Here's an example test case leveraging the ApplicationTestCase.
+HTTP Kernel is easy to test using PHPUnit. Here's an example test case leveraging the ApplicationTestCase.
 ```
 <?php
 namespace Tests\Routing;

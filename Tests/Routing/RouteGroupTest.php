@@ -1,8 +1,8 @@
 <?php
-namespace Koochik\Koochik\Tests\Routing;
-use Koochik\Koochik\Tests\Mocks\Middlewares\DummyMiddleware;
+namespace Kouchik\HttpKernel\Tests\Routing;
+use Kouchik\HttpKernel\Tests\Mocks\Middlewares\DummyMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Koochik\Koochik\Tests\TestCases\ApplicationTestCase;
+use Kouchik\HttpKernel\Tests\TestCases\ApplicationTestCase;
 use Laminas\Diactoros\Response;
 
 class RouteGroupTest extends ApplicationTestCase

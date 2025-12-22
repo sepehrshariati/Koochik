@@ -1,6 +1,6 @@
 <?php
 
-namespace Koochik\Koochik;
+namespace Kouchik\HttpKernel;
 
 class Group
 {

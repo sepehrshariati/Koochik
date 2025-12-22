@@ -1,12 +1,12 @@
 <?php
 
-namespace Koochik\Koochik;
+namespace Kouchik\HttpKernel;
 
 use FastRoute\DataGenerator\GroupCountBased as GroupCountBasedDataGenerator;
 use FastRoute\Dispatcher\GroupCountBased as GroupCountBasedDispatcher;
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std as StandardRouteParser;
-use Koochik\Koochik\Contracts\RouterInterface;
+use Kouchik\HttpKernel\Contracts\RouterInterface;
 
 class Router implements RouterInterface {
     private RouteCollector $routeCollector;

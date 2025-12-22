@@ -1,5 +1,5 @@
 <?php
-namespace Koochik\Koochik\Contracts;
+namespace Kouchik\HttpKernel\Contracts;
 interface RouteInterface
 {
     // Define route dispatching constants

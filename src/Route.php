@@ -1,8 +1,8 @@
 <?php
 
-namespace Koochik\Koochik;
+namespace Kouchik\HttpKernel;
 
-use Koochik\Koochik\Contracts\RouteInterface;
+use Kouchik\HttpKernel\Contracts\RouteInterface;
 
 class Route implements RouteInterface {
     private string $method;

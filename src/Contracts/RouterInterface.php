@@ -1,6 +1,6 @@
 <?php
-namespace Koochik\Koochik\Contracts;
-use Koochik\Koochik\Route;
+namespace Kouchik\HttpKernel\Contracts;
+use Kouchik\HttpKernel\Route;
 
 interface RouterInterface
 {

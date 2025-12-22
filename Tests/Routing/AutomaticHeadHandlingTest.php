@@ -1,11 +1,11 @@
 <?php
 
-namespace Koochik\Koochik\Tests\Routing;
+namespace Kouchik\HttpKernel\Tests\Routing;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Laminas\Diactoros\Response;
-use Koochik\Koochik\Tests\TestCases\ApplicationTestCase;
-use Koochik\Koochik\Tests\Mocks\Middlewares\DummyMiddleware;
+use Kouchik\HttpKernel\Tests\TestCases\ApplicationTestCase;
+use Kouchik\HttpKernel\Tests\Mocks\Middlewares\DummyMiddleware;
 
 class AutomaticHeadHandlingTest extends ApplicationTestCase
 {
